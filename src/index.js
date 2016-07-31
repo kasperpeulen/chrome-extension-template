@@ -5,5 +5,12 @@ import './index.css';
 
 ReactDOM.render(
   <App />,
-  document.getElementById('root')
+  createRootAndAppendToBody()
 );
+
+function createRootAndAppendToBody() {
+  const root = document.createElement('div');
+  root.id = 'extension-root';
+  document.body.appendChild(root);
+  return root;
+}

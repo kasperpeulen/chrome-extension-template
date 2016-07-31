@@ -3,6 +3,8 @@ var autoprefixer = require('autoprefixer');
 var webpack = require('webpack');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var paths = require('./paths');
+import port from "./port";
+import ManifestPlugin from '../scripts/manifest-plugin/index'
 
 module.exports = {
   devtool: 'eval',
@@ -16,8 +18,9 @@ module.exports = {
     // Next line is not used in dev but WebpackDevServer crashes without it:
     path: paths.appBuild,
     pathinfo: true,
-    filename: 'bundle.js',
-    publicPath: '/'
+    filename: '[name].js',
+    chunkFilename: '[name]-[chunkhash].js',
+    publicPath: `https://localhost:${port}/`
   },
   resolve: {
     extensions: ['', '.js', '.json'],
@@ -31,7 +34,10 @@ module.exports = {
       // a dependency in generated projects.
       // See https://github.com/facebookincubator/create-react-app/issues/255
       'babel-runtime/regenerator': require.resolve('babel-runtime/regenerator')
-    }
+    },
+    root: [
+      path.join(__dirname, "../src")
+    ]
   },
   resolveLoader: {
     root: paths.ownNodeModules,
@@ -87,6 +93,7 @@ module.exports = {
       template: paths.appHtml,
       favicon: paths.appFavicon,
     }),
+    new ManifestPlugin(paths.appManifest, paths.appBuild, port),
     new webpack.DefinePlugin({ 'process.env.NODE_ENV': '"development"' }),
     // Note: only CSS is currently hot reloaded
     new webpack.HotModuleReplacementPlugin()

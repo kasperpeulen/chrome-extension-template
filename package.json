@@ -1,5 +1,5 @@
 {
-  "name": "chrome-extension-template3",
+  "name": "create-react-chrome-extension-app",
   "version": "0.0.1",
   "private": true,
   "devDependencies": {
@@ -41,14 +41,21 @@
     "url-loader": "0.5.7",
     "webpack": "1.13.1",
     "webpack-dev-server": "1.14.1",
-    "whatwg-fetch": "1.0.0"
+    "whatwg-fetch": "1.0.0",
+
+    "babel-cli": "6.11.4",
+    "babel-preset-react-hmre": "1.1.1",
+    "cli-color": "1.1.0",
+    "cross-env": "^2.0.0",
+    "express": "4.14.0",
+    "lodash": "4.14.1"
   },
   "dependencies": {
     "react": "^15.2.1",
     "react-dom": "^15.2.1"
   },
   "scripts": {
-    "start": "node ./scripts/start.js",
+    "start": "babel-node --presets es2015,react,react-hmre ./scripts/start.js",
     "build": "node ./scripts/build.js"
   },
   "eslintConfig": {

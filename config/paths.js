@@ -49,6 +49,7 @@ if (isInCreateReactAppSource) {
     appFavicon: resolve('../favicon.ico'),
     appPackageJson: resolve('../package.json'),
     appSrc: resolve('../src'),
+    appManifest: resolve('../src/manifest.json'),
     appNodeModules: resolve('../node_modules'),
     ownNodeModules: resolve('../node_modules')
   };

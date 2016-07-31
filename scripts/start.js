@@ -10,8 +10,11 @@ var detect = require('detect-port');
 var prompt = require('./utils/prompt');
 var config = require('../config/webpack.config.dev');
 
+import overrideHotUpdater from './override'
+import port from '../config/port';
+
 // Tools like Cloud9 rely on this
-var DEFAULT_PORT = process.env.PORT || 3000;
+var DEFAULT_PORT = process.env.PORT || port;
 var compiler;
 
 // TODO: hide this behind a flag and eliminate dead code on eject.
@@ -120,6 +123,7 @@ function setupCompiler(port) {
   });
 }
 
+// this function is not used anymore for extension development
 function openBrowser(port) {
   if (process.platform === 'darwin') {
     try {
@@ -146,6 +150,7 @@ function runDevServer(port) {
     historyApiFallback: true,
     hot: true, // Note: only CSS is currently hot reloaded
     publicPath: config.output.publicPath,
+    https: true,
     quiet: true
   }).listen(port, (err, result) => {
     if (err) {
@@ -155,11 +160,11 @@ function runDevServer(port) {
     clearConsole();
     console.log(chalk.cyan('Starting the development server...'));
     console.log();
-    openBrowser(port);
   });
 }
 
 function run(port) {
+  overrideHotUpdater();
   setupCompiler(port);
   runDevServer(port);
 }
