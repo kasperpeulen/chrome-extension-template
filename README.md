@@ -18,7 +18,7 @@ my-app/
   package.json
   src/
     App.css
-    App.js
+    Counter.js
     index.css
     index.js
     logo.svg
@@ -40,7 +40,7 @@ They will not be included in the production build so you can use them for things
 
 >**Known Issue:**
 >
->You may encounter an issue where changing a file inside `src` doesn’t trigger a recompilation. Most likely this happens because the path in your filesystem differs in its casing from the path you imported. For example, if a file is called `App.js` but you are importing `app.js`, the watcher might not recognize changes to it. We are [considering](https://github.com/facebookincubator/create-react-app/issues/240) enforcing some checks to prevent this. If this doesn’t help, check out the page on [troubleshooting watching](https://webpack.github.io/docs/troubleshooting.html#watching).
+>You may encounter an issue where changing a file inside `src` doesn’t trigger a recompilation. Most likely this happens because the path in your filesystem differs in its casing from the path you imported. For example, if a file is called `Counter.js` but you are importing `app.js`, the watcher might not recognize changes to it. We are [considering](https://github.com/facebookincubator/create-react-app/issues/240) enforcing some checks to prevent this. If this doesn’t help, check out the page on [troubleshooting watching](https://webpack.github.io/docs/troubleshooting.html#watching).
 
 ## Available Scripts
 
@@ -277,11 +277,11 @@ node_modules/fbjs/lib/shallowEqual.js.flow:29
  29:     return x !== 0 || 1 / (x: $FlowIssue) === 1 / (y: $FlowIssue);
                                    ^^^^^^^^^^ identifier `$FlowIssue`. Could not resolve name
 
-src/App.js:3
+src/Counter.js:3
   3: import logo from './logo.svg';
                       ^^^^^^^^^^^^ ./logo.svg. Required module not found
 
-src/App.js:4
+src/Counter.js:4
   4: import './App.css';
             ^^^^^^^^^^^ ./App.css. Required module not found
 

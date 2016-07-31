@@ -26,7 +26,7 @@ request.send();`
 }
 
 export default function(scriptName, buildPath, port) {
-  if(process.env.NODE_ENV == 'development') {
+  if(process.env.NODE_ENV === 'development') {
     log.pending(`Making injector '${scriptName}'`)
 
     const injectorScript = makeInjector(scriptName, port);

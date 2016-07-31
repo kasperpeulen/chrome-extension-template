@@ -123,28 +123,6 @@ function setupCompiler(port) {
   });
 }
 
-// this function is not used anymore for extension development
-function openBrowser(port) {
-  if (process.platform === 'darwin') {
-    try {
-      // Try our best to reuse existing tab
-      // on OS X Google Chrome with AppleScript
-      execSync('ps cax | grep "Google Chrome"');
-      execSync(
-        'osascript ' +
-        path.resolve(__dirname, './utils/chrome.applescript') +
-        ' http://localhost:' + port + '/'
-      );
-      return;
-    } catch (err) {
-      // Ignore errors.
-    }
-  }
-  // Fallback to opn
-  // (It will always open new tab)
-  opn('http://localhost:' + port + '/');
-}
-
 function runDevServer(port) {
   new WebpackDevServer(compiler, {
     historyApiFallback: true,

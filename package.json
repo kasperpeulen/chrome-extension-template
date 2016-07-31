@@ -51,8 +51,13 @@
     "lodash": "4.14.1"
   },
   "dependencies": {
+    "bootstrap": "^4.0.0-alpha.2",
+    "lodash": "^4.13.1",
     "react": "^15.2.1",
-    "react-dom": "^15.2.1"
+    "react-dom": "^15.2.1",
+    "react-redux": "^4.0.0",
+    "react-router": "^2.0.1",
+    "redux": "^3.0.4"
   },
   "scripts": {
     "start": "babel-node --presets es2015,react,react-hmre ./scripts/start.js",

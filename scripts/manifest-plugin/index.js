@@ -7,7 +7,7 @@ export default class ManifestPlugin {
   constructor(manifestPath, buildPath, port) {
     this.port = port;
     this.Manifest = new Manifest(manifestPath, buildPath, port);
-    this.isDevelopment = process.env.NODE_ENV != "production"
+    this.isDevelopment = process.env.NODE_ENV !== "production"
   }
 
   apply(compiler) {

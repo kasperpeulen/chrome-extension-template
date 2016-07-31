@@ -1,11 +1,17 @@
+/* @flow */
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
+import Counter from './components/Counter';
+import {Provider} from 'react-redux';
+
+import {store} from './store';
 import './index.css';
 
 ReactDOM.render(
-  <App />,
-  createRootAndAppendToBody()
+    <Provider store={store}>
+      <Counter />
+    </Provider>
+    , createRootAndAppendToBody()
 );
 
 function createRootAndAppendToBody() {
