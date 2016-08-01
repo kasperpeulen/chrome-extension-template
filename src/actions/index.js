@@ -5,7 +5,7 @@ export type Increment = {
   type: 'Increment'
 }
 
-export function increment(): Increment {
+export function incrementCounter(): Increment {
   return {
     type: ActionTypes.increment
   }
@@ -15,7 +15,7 @@ export type Decrement = {
   type: 'Decrement'
 }
 
-export function decrement(): Decrement {
+export function decrementCounter(): Decrement {
   return {
     type: ActionTypes.decrement
   }
