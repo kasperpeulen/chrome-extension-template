@@ -1,9 +1,10 @@
 /* @flow */
 import React, {Component} from 'react';
-import './Counter.css';
 import {connect} from 'react-redux';
 import * as action from "../actions";
 import type {Dispatch} from 'redux';
+
+import './Counter.scss';
 
 class Counter extends Component {
   props:{
@@ -15,14 +16,21 @@ class Counter extends Component {
     var {counter, dispatch} = this.props;
     return (
         <div className="Counter">
-          <div>
-            <button onClick={() => dispatch(action.decrement())
+          <div style={{height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+            <div style={{flex: 1}}> </div>
+            <div>
+              {counter}
+            </div>
+            <div>
+              <button onClick={() => dispatch(action.decrementCounter())
           }>-
-            </button>
-            {counter}
-            <button onClick={() => dispatch(action.increment())
+              </button>
+
+              <button onClick={() => dispatch(action.incrementCounter())
           }>+
-            </button>
+              </button>
+            </div>
+            <div style={{flex: 1}}> </div>
           </div>
         </div>
     );
