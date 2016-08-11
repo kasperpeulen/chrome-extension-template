@@ -7,6 +7,7 @@ esproposal.class_static_fields=enable
 esproposal.class_instance_fields=enable
 
 module.name_mapper.extension='css' -> '<PROJECT_ROOT>/config/flow/css.js.flow'
+module.name_mapper.extension='scss' -> '<PROJECT_ROOT>/config/flow/css.js.flow'
 module.name_mapper='^\(.*\)\.\(jpg\|png\|gif\|eot\|svg\|ttf\|woff\|woff2\|mp4\|webm\)$' -> '<PROJECT_ROOT>/config/flow/file'
 
 suppress_type=$FlowIssue
