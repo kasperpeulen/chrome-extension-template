@@ -22,6 +22,7 @@ Features:
 * Automatic refreshes webpage where extension is active on save (hot reload with css changes)
 * React/Redux boilerplate
 * Flow support
+* SCSS support
 * Uses classes for actions using `redux-support-action-class`
 * Redux Devtool support is included
 
