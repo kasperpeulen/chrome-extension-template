@@ -1,7 +1,6 @@
 // @flow
-import type {Action} from './action';
+import Action from './Action';
 import Counter from './Counter';
-
 
 function rootReducer(state: any = {}, action: Action) {
   return {

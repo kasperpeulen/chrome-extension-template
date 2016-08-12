@@ -61,7 +61,8 @@
     "react-dom": "^15.2.1",
     "react-redux": "^4.0.0",
     "react-router": "^2.0.1",
-    "redux": "^3.0.4"
+    "redux": "^3.0.4",
+    "redux-support-action-class": "^0.1.0"
   },
   "scripts": {
     "start": "babel-node --presets es2015,react,react-hmre ./scripts/start.js",

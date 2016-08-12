@@ -1,10 +1,13 @@
-import ActionTypes from "./ActionTypes";
+// @flow
+import Actions from './Actions';
+import Action from '../Action';
 
 export default function reducer(counter: number = 0, action: Action): number {
-  if (action.type === ActionTypes.increment) {
+  if (action instanceof Actions.Increment) {
     return counter + 1;
-  } else if (action.type === ActionTypes.decrement) {
+  } else if (action instanceof Actions.Decrement) {
     return counter - 1;
+  } else {
+    return counter;
   }
-  return counter;
 }
