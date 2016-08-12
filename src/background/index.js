@@ -1,3 +1,4 @@
+/* eslint-disable */
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   // Include Redux DevTools extension
   const httpRequest = new XMLHttpRequest();
