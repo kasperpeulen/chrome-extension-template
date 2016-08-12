@@ -27,3 +27,8 @@ Features:
 * Redux Devtool support is included
 
 But yeah, this is just to get people started, please fork it and make your own version :)
+
+Much of the content in the scripts folder is copied from:
+https://github.com/schovi/webpack-chrome-extension
+
+Thanks schovi! This makes sure that hot reloading of extension using webpack is possible.
