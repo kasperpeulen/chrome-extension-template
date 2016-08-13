@@ -10,7 +10,8 @@
       "js": ["index.js"]
     }
   ],
-  "permissions": [         "tabs",
+  "permissions": [
+    "tabs",
     "notifications",
     "http://*/",
     "https://*/" ]
