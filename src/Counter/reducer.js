@@ -1,6 +1,6 @@
 // @flow
 import Actions from './Actions';
-import Action from '../Action';
+import {Action} from 'redux-support-action-class';
 
 export default function reducer(counter: number = 0, action: Action): number {
   if (action instanceof Actions.Increment) {

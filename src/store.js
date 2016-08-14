@@ -3,9 +3,10 @@ import rootReducer from './reducer';
 import {compose, createStore, applyMiddleware} from 'redux';
 import {
   supportActionClassEnhancer,
-  supportActionClassMiddleware
+  supportActionClassMiddleware,
+  Action
 } from "redux-support-action-class";
-import Action from './Action';
+
 import Actions from './Actions';
 
 export const store = createStore(

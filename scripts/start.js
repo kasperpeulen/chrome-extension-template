@@ -63,11 +63,14 @@ function clearConsole() {
   process.stdout.write('\x1bc');
 }
 
+var start;
+
 function setupCompiler(port) {
   compiler = webpack(config, handleCompile);
 
   compiler.plugin('invalid', function() {
     clearConsole();
+    start = new Date();
     console.log('Compiling...');
   });
 
@@ -76,9 +79,11 @@ function setupCompiler(port) {
     var hasErrors = stats.hasErrors();
     var hasWarnings = stats.hasWarnings();
     if (!hasErrors && !hasWarnings) {
-      console.log(chalk.green('Compiled successfully!'));
+      const time = new Date() - start;
+      console.log(chalk.green(`Compiled successfully (${time} ms)!`));
+
       console.log();
-      console.log('The app is running at http://localhost:' + port + '/');
+      console.log(`The server is running at http://localhost:${port}/`);
       console.log();
       return;
     }
@@ -142,6 +147,7 @@ function runDevServer(port) {
 }
 
 function run(port) {
+  start = new Date();
   overrideHotUpdater();
   setupCompiler(port);
   runDevServer(port);

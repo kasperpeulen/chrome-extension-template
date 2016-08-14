@@ -7,7 +7,7 @@ import port from "./port";
 import ManifestPlugin from '../scripts/manifest-plugin/index'
 
 module.exports = {
-  devtool: 'eval',
+  devtool: 'cheap-module-eval-source-map',
   entry: [
     require.resolve('webpack-dev-server/client'),
     require.resolve('webpack/hot/dev-server'),
@@ -20,7 +20,8 @@ module.exports = {
     pathinfo: true,
     filename: '[name].js',
     chunkFilename: '[name]-[chunkhash].js',
-    publicPath: `https://localhost:${port}/`
+    publicPath: `https://localhost:${port}/`,
+    devtoolModuleFilenameTemplate: '[absolute-resource-path]'
   },
   resolve: {
     extensions: ['', '.js', '.json'],

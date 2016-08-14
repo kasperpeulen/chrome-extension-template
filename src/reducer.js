@@ -1,5 +1,5 @@
 // @flow
-import Action from './Action';
+import {Action} from 'redux-support-action-class';
 import Counter from './Counter';
 
 function rootReducer(state: any = {}, action: Action) {

@@ -8,10 +8,10 @@ import {store} from './store';
 import './index.css';
 
 ReactDOM.render(
-    <Provider store={store}>
-      <Counter />
-    </Provider>
-    , createRootAndAppendToBody()
+  <Provider store={store}>
+    <Counter />
+  </Provider>
+  , createRootAndAppendToBody()
 );
 
 function createRootAndAppendToBody() {
