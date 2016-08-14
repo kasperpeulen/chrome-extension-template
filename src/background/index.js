@@ -1,5 +1,5 @@
 /* eslint-disable */
-chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+chrome.tabs.onUpdated.addListener(function (tabId) {
   // Include Redux DevTools extension
   const httpRequest = new XMLHttpRequest();
   httpRequest.open('GET', 'chrome-extension://lmhkpmbekcpmknklioeibfkpmmfibljd/js/inject.bundle.js');
