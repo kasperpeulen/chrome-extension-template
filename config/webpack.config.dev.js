@@ -4,7 +4,7 @@ var webpack = require('webpack');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var paths = require('./paths');
 import port from "./port";
-import ManifestPlugin from '../scripts/manifest-plugin/index'
+import {ChromeExtensionPlugin} from 'chrome-extension-webpack-plugin';
 
 module.exports = {
   devtool: 'cheap-module-eval-source-map',
@@ -99,7 +99,7 @@ module.exports = {
       template: paths.appHtml,
       favicon: paths.appFavicon,
     }),
-    new ManifestPlugin(paths.appManifest, paths.appBuild, port),
+    new ChromeExtensionPlugin(paths.appManifest, paths.appBuild, port, paths),
     new webpack.DefinePlugin({ 'process.env.NODE_ENV': '"development"' }),
     // Note: only CSS is currently hot reloaded
     new webpack.HotModuleReplacementPlugin()

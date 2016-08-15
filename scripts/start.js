@@ -1,16 +1,12 @@
 process.env.NODE_ENV = 'development';
 
-var path = require('path');
 var chalk = require('chalk');
 var webpack = require('webpack');
 var WebpackDevServer = require('webpack-dev-server');
-var execSync = require('child_process').execSync;
-var opn = require('opn');
 var detect = require('detect-port');
 var prompt = require('./utils/prompt');
 var config = require('../config/webpack.config.dev');
 
-import overrideHotUpdater from './override'
 import port from '../config/port';
 
 // Tools like Cloud9 rely on this
@@ -148,7 +144,6 @@ function runDevServer(port) {
 
 function run(port) {
   start = new Date();
-  overrideHotUpdater();
   setupCompiler(port);
   runDevServer(port);
 }
