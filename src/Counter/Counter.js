@@ -6,13 +6,14 @@ import './Counter.scss';
 
 class Counter extends Component {
   render() {
-    const {counter, dispatch} = this.props;
+    const {show, value, dispatch} = this.props;
+    if (!show) return null;
     return (
       <div className="Counter">
         <div style={{height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
           <div style={{flex: 1}}> </div>
           <div>
-            {counter}
+            {value}
           </div>
           <div>
             <button onClick={() => dispatch(new Action.Decrement())}>-</button>
@@ -26,9 +27,8 @@ class Counter extends Component {
 }
 
 export default connect(
-  ({counter}) => {
-    return {
-      counter
-    }
+  ({Counter}) => {
+    const {show, value} = Counter;
+    return {show, value}
   }
 )(Counter);

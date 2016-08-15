@@ -11,7 +11,6 @@ import Actions from './Actions';
 
 export const store = createStore(
   rootReducer,
-  {},
   compose(
     supportActionClassEnhancer(Actions),
     applyMiddleware(supportActionClassMiddleware(Action)),

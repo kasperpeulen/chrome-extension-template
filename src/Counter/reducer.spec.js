@@ -1,6 +1,7 @@
-import counterReducer from './reducer';
+import {counterReducer} from './reducer';
 import Actions from './Actions';
 import {Action} from "redux-support-action-class";
+
 describe('counterReducer', () => {
   it('increments', () => {
     var state = counterReducer(0, new Actions.Increment());
