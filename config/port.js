@@ -1,1 +1,1 @@
-module.exports = 3000;
+module.exports = process.env.PORT || 3000;

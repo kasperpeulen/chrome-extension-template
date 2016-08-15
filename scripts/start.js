@@ -1,10 +1,13 @@
 process.env.NODE_ENV = 'development';
 
+var path = require('path');
 var chalk = require('chalk');
 var webpack = require('webpack');
 var WebpackDevServer = require('webpack-dev-server');
 var historyApiFallback = require('connect-history-api-fallback');
 var httpProxyMiddleware = require('http-proxy-middleware');
+var execSync = require('child_process').execSync;
+var opn = require('opn');
 var detect = require('detect-port');
 var prompt = require('./utils/prompt');
 var config = require('../config/webpack.config.dev');
@@ -12,10 +15,8 @@ var paths = require('../config/paths');
 
 var port = require('../config/port');
 
-var start;
-
 // Tools like Cloud9 rely on this
-var DEFAULT_PORT = process.env.PORT || port;
+var DEFAULT_PORT = port;
 var compiler;
 
 // TODO: hide this behind a flag and eliminate dead code on eject.
@@ -75,7 +76,6 @@ function setupCompiler(port) {
   // "invalid" is short for "bundle invalidated", it doesn't imply any errors.
   compiler.plugin('invalid', function() {
     clearConsole();
-    start = new Date();
     console.log('Compiling...');
   });
 
@@ -86,9 +86,7 @@ function setupCompiler(port) {
     var hasErrors = stats.hasErrors();
     var hasWarnings = stats.hasWarnings();
     if (!hasErrors && !hasWarnings) {
-      const time = new Date() - start;
-      console.log(chalk.green(`Compiled successfully (${time} ms)!`));
-
+      console.log(chalk.green('Compiled successfully!'));
       console.log();
       console.log(`The server is running at:`);
       console.log();
@@ -143,6 +141,25 @@ function setupCompiler(port) {
   });
 }
 
+function openBrowser(port) {
+  if (process.platform === 'darwin') {
+    try {
+      // Try our best to reuse existing tab
+      // on OS X Google Chrome with AppleScript
+      execSync('ps cax | grep "Google Chrome"');
+      execSync(
+        'osascript chrome.applescript http://localhost:' + port + '/',
+        {cwd: path.join(__dirname, 'utils'), stdio: 'ignore'}
+      );
+      return;
+    } catch (err) {
+      // Ignore errors.
+    }
+  }
+  // Fallback to opn
+  // (It will always open new tab)
+  opn('http://localhost:' + port + '/');
+}
 
 function addMiddleware(devServer) {
   // `proxy` lets you to specify a fallback server during development.
@@ -232,7 +249,6 @@ function runDevServer(port) {
 }
 
 function run(port) {
-  start = new Date();
   setupCompiler(port);
   runDevServer(port);
 }

@@ -10,12 +10,18 @@ var env = require('./env');
 var port = require("./port");
 var ChromeExtensionPlugin = require('chrome-extension-webpack-plugin').ChromeExtensionPlugin;
 
+// This is the development configuration.
+// It is focused on developer experience and fast rebuilds.
+// The production configuration is different and lives in a separate file.
 module.exports = {
   // This makes the bundle appear split into separate modules in the devtools.
   // We don't use source maps here because they can be confusing:
   // https://github.com/facebookincubator/create-react-app/issues/343#issuecomment-237241875
   // You may want 'cheap-module-source-map' instead if you prefer source maps.
   devtool: 'cheap-module-eval-source-map',
+  // These are the "entry points" to our application.
+  // This means they will be the "root" imports that are included in JS bundle.
+  // The first two entry points enable "hot" CSS and auto-refreshes for JS.
   entry: [
     // Include WebpackDevServer client. It connects to WebpackDevServer via
     // sockets and waits for recompile notifications. When WebpackDevServer
@@ -152,6 +158,7 @@ module.exports = {
       }
     ]
   },
+  // Point ESLint to our predefined config.
   eslint: {
     configFile: path.join(__dirname, 'eslint.js'),
     useEslintrc: false
