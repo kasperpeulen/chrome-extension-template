@@ -23,6 +23,7 @@ Features:
 * React/Redux boilerplate
 * Flow support
 * SCSS support
+* Jest support
 * Uses classes for actions using `redux-support-action-class`
 * Redux Devtool support is included
 
