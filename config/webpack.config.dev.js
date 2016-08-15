@@ -88,6 +88,11 @@ module.exports = {
         test: /\.js$/,
         loader: 'eslint',
         include: paths.appSrc,
+      },
+      {
+        test: /\.js$/,
+        loader: 'flowtype',
+        include: paths.appSrc,
       }
     ],
     loaders: [
@@ -164,7 +169,7 @@ module.exports = {
     useEslintrc: false
   },
   // We use PostCSS for autoprefixing only.
-  postcss: function() {
+  postcss: function () {
     return [
       autoprefixer({
         browsers: [
