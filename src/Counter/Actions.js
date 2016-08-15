@@ -1,7 +1,10 @@
 // @flow
 import {Action} from 'redux-support-action-class';
 
-class Increment extends Action {}
-class Decrement extends Action {}
+// abstract
+class CounterAction extends Action {}
+
+class Increment extends CounterAction {}
+class Decrement extends CounterAction {}
 
 export default {Decrement, Increment};

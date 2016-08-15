@@ -1,4 +1,6 @@
 // @flow
 import Counter from './Counter';
 
-export default {...Counter.actions};
+export default {
+  Counter: Counter.actions
+};

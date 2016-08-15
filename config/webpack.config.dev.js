@@ -2,17 +2,43 @@ var path = require('path');
 var autoprefixer = require('autoprefixer');
 var webpack = require('webpack');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
+var CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
+var WatchMissingNodeModulesPlugin = require('../scripts/utils/WatchMissingNodeModulesPlugin');
 var paths = require('./paths');
-import port from "./port";
-import {ChromeExtensionPlugin} from 'chrome-extension-webpack-plugin';
+var env = require('./env');
+
+var port = require("./port");
+var ChromeExtensionPlugin = require('chrome-extension-webpack-plugin').ChromeExtensionPlugin;
 
 module.exports = {
+  // This makes the bundle appear split into separate modules in the devtools.
+  // We don't use source maps here because they can be confusing:
+  // https://github.com/facebookincubator/create-react-app/issues/343#issuecomment-237241875
+  // You may want 'cheap-module-source-map' instead if you prefer source maps.
   devtool: 'cheap-module-eval-source-map',
   entry: [
-    require.resolve('webpack-dev-server/client'),
+    // Include WebpackDevServer client. It connects to WebpackDevServer via
+    // sockets and waits for recompile notifications. When WebpackDevServer
+    // recompiles, it sends a message to the client by socket. If only CSS
+    // was changed, the app reload just the CSS. Otherwise, it will refresh.
+    // The "?/" bit at the end tells the client to look for the socket at
+    // the root path, i.e. /sockjs-node/. Otherwise visiting a client-side
+    // route like /todos/42 would make it wrongly request /todos/42/sockjs-node.
+    // The socket server is a part of WebpackDevServer which we are using.
+    // The /sockjs-node/ path I'm referring to is hardcoded in WebpackDevServer.
+    require.resolve('webpack-dev-server/client') + '?/',
+    // Include Webpack hot module replacement runtime. Webpack is pretty
+    // low-level so we need to put all the pieces together. The runtime listens
+    // to the events received by the client above, and applies updates (such as
+    // new CSS) to the running application.
     require.resolve('webpack/hot/dev-server'),
+    // We ship a few polyfills by default.
     require.resolve('./polyfills'),
+    // Finally, this is your app's code:
     path.join(paths.appSrc, 'index')
+    // We include the app code last so that if there is a runtime error during
+    // initialization, it doesn't blow up the WebpackDevServer client, and
+    // changing JS code would still trigger a refresh.
   ],
   output: {
     // Next line is not used in dev but WebpackDevServer crashes without it:
@@ -21,10 +47,11 @@ module.exports = {
     filename: '[name].js',
     chunkFilename: '[name]-[chunkhash].js',
     publicPath: `https://localhost:${port}/`,
-    devtoolModuleFilenameTemplate: '[absolute-resource-path]'
+    devtoolModuleFilenameTemplate: '[resource-path]'
   },
   resolve: {
-    extensions: ['', '.js', '.json'],
+    // These are the reasonable defaults supported by the Node ecosystem.
+    extensions: ['.js', '.json', ''],
     alias: {
       // This `alias` section can be safely removed after ejection.
       // We do this because `babel-runtime` may be inside `react-scripts`,
@@ -40,49 +67,88 @@ module.exports = {
       path.join(__dirname, "../src")
     ]
   },
+  // Resolve loaders (webpack plugins for CSS, images, transpilation) from the
+  // directory of `react-scripts` itself rather than the project directory.
+  // You can remove this after ejecting.
   resolveLoader: {
     root: paths.ownNodeModules,
     moduleTemplates: ['*-loader']
   },
   module: {
+    // First, run the linter.
+    // It's important to do this before Babel processes the JS.
     preLoaders: [
       {
         test: /\.js$/,
         loader: 'eslint',
         include: paths.appSrc,
-      },
-      {
-        test: /\.js$/,
-        loader: 'flowtype',
-        include: paths.appSrc,
       }
     ],
     loaders: [
+      // Process JS with Babel.
       {
         test: /\.js$/,
         include: paths.appSrc,
         loader: 'babel',
         query: require('./babel.dev')
       },
+      // "postcss" loader applies autoprefixer to our CSS.
+      // "css" loader resolves paths in CSS and adds assets as dependencies.
+      // "style" loader turns CSS into JS modules that inject <style> tags.
+      // In production, we use a plugin to extract that CSS to a file, but
+      // in development "style" loader enables hot editing of CSS.
       {
         test: /\.s?css$/,
         include: [paths.appSrc, paths.appNodeModules],
         loader: 'style!css!postcss!sass'
       },
+      // JSON is not enabled by default in Webpack but both Node and Browserify
+      // allow it implicitly so we also enable it.
       {
         test: /\.json$/,
         include: [paths.appSrc, paths.appNodeModules],
         loader: 'json'
       },
+      // "file" loader makes sure those assets get served by WebpackDevServer.
+      // When you `import` an asset, you get its (virtual) filename.
+      // In production, they would get copied to the `build` folder.
       {
-        test: /\.(jpg|png|gif|eot|svg|ttf|woff|woff2)$/,
+        test: /\.(ico|jpg|png|gif|eot|svg|ttf|woff|woff2)(\?.*)?$/,
         include: [paths.appSrc, paths.appNodeModules],
+        exclude: /\/favicon.ico$/,
         loader: 'file',
+        query: {
+          name: 'static/media/[name].[ext]'
+        }
       },
+      // A special case for favicon.ico to place it into build root directory.
       {
-        test: /\.(mp4|webm)$/,
+        test: /\/favicon.ico$/,
+        include: [paths.appSrc],
+        loader: 'file',
+        query: {
+          name: 'favicon.ico?[hash:8]'
+        }
+      },
+      // "url" loader works just like "file" loader but it also embeds
+      // assets smaller than specified size as data URLs to avoid requests.
+      {
+        test: /\.(mp4|webm)(\?.*)?$/,
         include: [paths.appSrc, paths.appNodeModules],
-        loader: 'url?limit=10000'
+        loader: 'url',
+        query: {
+          limit: 10000,
+          name: 'static/media/[name].[ext]'
+        }
+      },
+      // "html" loader is used to process template page (index.html) to resolve
+      // resources linked with <link href="./relative/path"> HTML tags.
+      {
+        test: /\.html$/,
+        loader: 'html',
+        query: {
+          attrs: ['link:href'],
+        }
       }
     ]
   },
@@ -90,18 +156,39 @@ module.exports = {
     configFile: path.join(__dirname, 'eslint.js'),
     useEslintrc: false
   },
+  // We use PostCSS for autoprefixing only.
   postcss: function() {
-    return [autoprefixer];
+    return [
+      autoprefixer({
+        browsers: [
+          '>1%',
+          'last 4 versions',
+          'Firefox ESR',
+          'not ie < 9', // React doesn't support IE8 anyway
+        ]
+      }),
+    ];
   },
   plugins: [
+    // Generates an `index.html` file with the <script> injected.
     new HtmlWebpackPlugin({
       inject: true,
       template: paths.appHtml,
-      favicon: paths.appFavicon,
     }),
-    new ChromeExtensionPlugin(paths.appManifest, paths.appBuild, port, paths),
-    new webpack.DefinePlugin({ 'process.env.NODE_ENV': '"development"' }),
-    // Note: only CSS is currently hot reloaded
-    new webpack.HotModuleReplacementPlugin()
+    // Makes some environment variables available to the JS code, for example:
+    // if (process.env.NODE_ENV === 'development') { ... }. See `env.js`.
+    new webpack.DefinePlugin(env),
+    // This is necessary to emit hot updates (currently CSS only):
+    new webpack.HotModuleReplacementPlugin(),
+    // Watcher doesn't work well if you mistype casing in a path so we use
+    // a plugin that prints an error when you attempt to do this.
+    // See https://github.com/facebookincubator/create-react-app/issues/240
+    new CaseSensitivePathsPlugin(),
+    // If you require a missing module and then `npm install` it, you still have
+    // to restart the development server for Webpack to discover it. This plugin
+    // makes the discovery automatic so you don't have to restart.
+    // See https://github.com/facebookincubator/create-react-app/issues/186
+    new WatchMissingNodeModulesPlugin(paths.appNodeModules),
+    new ChromeExtensionPlugin(paths.appManifest, paths.appBuild, port, paths)
   ]
 };

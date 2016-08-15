@@ -3,11 +3,16 @@ process.env.NODE_ENV = 'development';
 var chalk = require('chalk');
 var webpack = require('webpack');
 var WebpackDevServer = require('webpack-dev-server');
+var historyApiFallback = require('connect-history-api-fallback');
+var httpProxyMiddleware = require('http-proxy-middleware');
 var detect = require('detect-port');
 var prompt = require('./utils/prompt');
 var config = require('../config/webpack.config.dev');
+var paths = require('../config/paths');
 
-import port from '../config/port';
+var port = require('../config/port');
+
+var start;
 
 // Tools like Cloud9 rely on this
 var DEFAULT_PORT = process.env.PORT || port;
@@ -27,18 +32,16 @@ if (isSmokeTest) {
   };
 }
 
+// Some custom utilities to prettify Webpack output.
+// This is a little hacky.
+// It would be easier if webpack provided a rich error object.
 var friendlySyntaxErrorLabel = 'Syntax error:';
-
 function isLikelyASyntaxError(message) {
   return message.indexOf(friendlySyntaxErrorLabel) !== -1;
 }
-
-// This is a little hacky.
-// It would be easier if webpack provided a rich error object.
-
 function formatMessage(message) {
   return message
-    // Make some common errors shorter:
+  // Make some common errors shorter:
     .replace(
       // Babel syntax error
       'Module build failed: SyntaxError:',
@@ -56,20 +59,28 @@ function formatMessage(message) {
 }
 
 function clearConsole() {
+  // This seems to work best on Windows and other systems.
+  // The intention is to clear the output so you can focus on most recent build.
   process.stdout.write('\x1bc');
 }
 
-var start;
-
 function setupCompiler(port) {
+  // "Compiler" is a low-level interface to Webpack.
+  // It lets us listen to some events and provide our own custom messages.
   compiler = webpack(config, handleCompile);
 
+  // "invalid" event fires when you have changed a file, and Webpack is
+  // recompiling a bundle. WebpackDevServer takes care to pause serving the
+  // bundle, so if you refresh, it'll wait instead of serving the old one.
+  // "invalid" is short for "bundle invalidated", it doesn't imply any errors.
   compiler.plugin('invalid', function() {
     clearConsole();
     start = new Date();
     console.log('Compiling...');
   });
 
+  // "done" event fires when Webpack has finished recompiling the bundle.
+  // Whether or not you have warnings or errors, you will get this event.
   compiler.plugin('done', function(stats) {
     clearConsole();
     var hasErrors = stats.hasErrors();
@@ -79,19 +90,28 @@ function setupCompiler(port) {
       console.log(chalk.green(`Compiled successfully (${time} ms)!`));
 
       console.log();
-      console.log(`The server is running at http://localhost:${port}/`);
+      console.log(`The server is running at:`);
+      console.log();
+      console.log('  ' + chalk.cyan('https://localhost:' + port + '/'));
+      console.log();
+      console.log('Note that the development build is not optimized.');
+      console.log('To create a production build, use ' + chalk.cyan('npm run build') + '.');
       console.log();
       return;
     }
 
-    var json = stats.toJson();
+    // We have switched off the default Webpack output in WebpackDevServer
+    // options so we are going to "massage" the warnings and errors and present
+    // them in a readable focused way.
+    // We use stats.toJson({}, true) to make output more compact and readable:
+    // https://github.com/facebookincubator/create-react-app/issues/401#issuecomment-238291901
+    var json = stats.toJson({}, true);
     var formattedErrors = json.errors.map(message =>
       'Error in ' + formatMessage(message)
     );
     var formattedWarnings = json.warnings.map(message =>
       'Warning in ' + formatMessage(message)
     );
-
     if (hasErrors) {
       console.log(chalk.red('Failed to compile.'));
       console.log();
@@ -108,7 +128,6 @@ function setupCompiler(port) {
       // If errors exist, ignore warnings.
       return;
     }
-
     if (hasWarnings) {
       console.log(chalk.yellow('Compiled with warnings.'));
       console.log();
@@ -116,7 +135,7 @@ function setupCompiler(port) {
         console.log(message);
         console.log();
       });
-
+      // Teach some ESLint tricks.
       console.log('You may use special comments to disable some warnings.');
       console.log('Use ' + chalk.yellow('// eslint-disable-next-line') + ' to ignore the next line.');
       console.log('Use ' + chalk.yellow('/* eslint-disable */') + ' to ignore all warnings in a file.');
@@ -124,14 +143,83 @@ function setupCompiler(port) {
   });
 }
 
+
+function addMiddleware(devServer) {
+  // `proxy` lets you to specify a fallback server during development.
+  // Every unrecognized request will be forwarded to it.
+  var proxy = require(paths.appPackageJson).proxy;
+  devServer.use(historyApiFallback({
+    // Allow paths with dots in them to be loaded, reference issue #387
+    disableDotRule: true,
+    // For single page apps, we generally want to fallback to /index.html.
+    // However we also want to respect `proxy` for API calls.
+    // So if `proxy` is specified, we need to decide which fallback to use.
+    // We use a heuristic: if request `accept`s text/html, we pick /index.html.
+    // Modern browsers include text/html into `accept` header when navigating.
+    // However API calls like `fetch()` won’t generally won’t accept text/html.
+    // If this heuristic doesn’t work well for you, don’t use `proxy`.
+    htmlAcceptHeaders: proxy ?
+      ['text/html'] :
+      ['text/html', '*/*']
+  }));
+  if (proxy) {
+    if (typeof proxy !== 'string') {
+      console.log(chalk.red('When specified, "proxy" in package.json must be a string.'));
+      console.log(chalk.red('Instead, the type of "proxy" was "' + typeof proxy + '".'));
+      console.log(chalk.red('Either remove "proxy" from package.json, or make it a string.'));
+      process.exit(1);
+    }
+
+    // Otherwise, if proxy is specified, we will let it handle any request.
+    // There are a few exceptions which we won't send to the proxy:
+    // - /index.html (served as HTML5 history API fallback)
+    // - /*.hot-update.json (WebpackDevServer uses this too for hot reloading)
+    // - /sockjs-node/* (WebpackDevServer uses this for hot reloading)
+    // Tip: use https://www.debuggex.com/ to visualize the regex
+    var mayProxy = /^(?!\/(index\.html$|.*\.hot-update\.json$|sockjs-node\/)).*$/;
+    devServer.use(mayProxy,
+      // Pass the scope regex both to Express and to the middleware for proxying
+      // of both HTTP and WebSockets to work without false positives.
+      httpProxyMiddleware(pathname => mayProxy.test(pathname), {
+        target: proxy,
+        logLevel: 'silent',
+        secure: false,
+        changeOrigin: true
+      })
+    );
+  }
+  // Finally, by now we have certainly resolved the URL.
+  // It may be /index.html, so let the dev server try serving it again.
+  devServer.use(devServer.middleware);
+}
+
 function runDevServer(port) {
-  new WebpackDevServer(compiler, {
-    historyApiFallback: true,
-    hot: true, // Note: only CSS is currently hot reloaded
+  var devServer = new WebpackDevServer(compiler, {
+    // Enable hot reloading server. It will provide /sockjs-node/ endpoint
+    // for the WebpackDevServer client so it can learn when the files were
+    // updated. The WebpackDevServer client is included as an entry point
+    // in the Webpack development configuration. Note that only changes
+    // to CSS are currently hot reloaded. JS changes will refresh the browser.
+    hot: true,
+    // It is important to tell WebpackDevServer to use the same "root" path
+    // as we specified in the config. In development, we always serve from /.
     publicPath: config.output.publicPath,
+    // WebpackDevServer is noisy by default so we emit custom message instead
+    // by listening to the compiler events with `compiler.plugin` calls above.
     https: true,
-    quiet: true
-  }).listen(port, (err, result) => {
+    quiet: true,
+    // Reportedly, this avoids CPU overload on some systems.
+    // https://github.com/facebookincubator/create-react-app/issues/293
+    watchOptions: {
+      ignored: /node_modules/
+    }
+  });
+
+  // Our custom middleware proxies requests to /index.html or a remote API.
+  addMiddleware(devServer);
+
+  // Launch WebpackDevServer.
+  devServer.listen(port, (err, result) => {
     if (err) {
       return console.log(err);
     }
@@ -139,6 +227,7 @@ function runDevServer(port) {
     clearConsole();
     console.log(chalk.cyan('Starting the development server...'));
     console.log();
+    // openBrowser(port);
   });
 }
 
@@ -148,6 +237,8 @@ function run(port) {
   runDevServer(port);
 }
 
+// We attempt to use the default port but if it is busy, we offer the user to
+// run on a different port. `detect()` Promise resolves to the next free port.
 detect(DEFAULT_PORT).then(port => {
   if (port === DEFAULT_PORT) {
     run(port);
@@ -156,8 +247,8 @@ detect(DEFAULT_PORT).then(port => {
 
   clearConsole();
   var question =
-    chalk.yellow('Something is already running at port ' + DEFAULT_PORT + '.') +
-    '\n\nWould you like to run the app at another port instead?';
+    chalk.yellow('Something is already running on port ' + DEFAULT_PORT + '.') +
+    '\n\nWould you like to run the app on another port instead?';
 
   prompt(question, true).then(shouldChangePort => {
     if (shouldChangePort) {
