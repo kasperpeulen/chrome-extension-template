@@ -15,6 +15,8 @@ var paths = require('../config/paths');
 
 var port = require('../config/port');
 
+var overrideHotUpdater = require('chrome-extension-webpack-plugin').overrideHotUpdater;
+
 // Tools like Cloud9 rely on this
 var DEFAULT_PORT = port;
 var compiler;
@@ -32,6 +34,8 @@ if (isSmokeTest) {
     }
   };
 }
+
+overrideHotUpdater(paths.appNodeModules);
 
 // Some custom utilities to prettify Webpack output.
 // This is a little hacky.
