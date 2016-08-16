@@ -3,14 +3,16 @@ import type { Dispatch, Store } from 'redux'
 declare module 'react-redux' {
 
   /*
-   S = State
-   A = Action
-   OP = OwnProps
-   SP = StateProps
-   DP = DispatchProps
-   */
 
-  declare type MapStateToProps<S, OP, SP: Object> = (state: S, ownProps: OP) => SP | MapStateToProps<S, OP, SP>;
+    S = State
+    A = Action
+    OP = OwnProps
+    SP = StateProps
+    DP = DispatchProps
+
+  */
+
+  declare type MapStateToProps<S, OP, SP: Object> = (state: S, ownProps: OP) => SP;
 
   declare type MapDispatchToProps<S, A, OP, DP> = (dispatch: Dispatch<S, A>, ownProps: OP) => DP;
 
@@ -18,12 +20,12 @@ declare module 'react-redux' {
 
   declare type StatelessComponent<P> = (props: P) => ?React$Element<any>;
 
-  declare class ConnectedComponent<OP, P, Def, St> extends React$Component<Def, OP, St> {
-  static WrappedComponent: any;
-  getWrappedInstance(): any;
-  static defaultProps: Def;
-  props: OP;
-  state: St;
+  declare class ConnectedComponent<OP, P, Def, St> extends React$Component<void, OP, void> {
+    static WrappedComponent: Class<React$Component<Def, OP, St>>;
+    getWrappedInstance(): React$Component<Def, P, St>;
+    static defaultProps: void;
+    props: OP;
+    state: void;
   }
 
   declare type ConnectedComponentClass<OP, P, Def, St> = Class<ConnectedComponent<OP, P, Def, St>>;

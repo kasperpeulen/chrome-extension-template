@@ -1,6 +1,6 @@
-import {counterReducer} from './reducer';
-import Actions from './Actions';
 import {Action} from "redux-support-action-class";
+import {counterReducer} from './reducer';
+import * as Actions from './Actions';
 
 describe('counterReducer', () => {
   it('increments', () => {

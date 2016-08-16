@@ -1,13 +1,11 @@
 // @flow
-import {Action} from 'redux-support-action-class';
+import {Action} from "redux-support-action-class";
 
 // abstract
 class CounterAction extends Action {}
 
-class Increment extends CounterAction {}
-class Decrement extends CounterAction {}
-class Hide extends CounterAction {}
-class Show extends CounterAction {}
-class Toggle extends CounterAction {}
-
-export default {Decrement, Increment, Hide, Show, Toggle};
+export class Increment extends CounterAction {}
+export class Decrement extends CounterAction {}
+export class Hide extends CounterAction {}
+export class Show extends CounterAction {}
+export class Toggle extends CounterAction {}

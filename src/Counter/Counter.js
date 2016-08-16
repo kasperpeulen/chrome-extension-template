@@ -1,34 +1,45 @@
 // @flow
-import React, {Component} from 'react';
+import React from 'react';
 import {connect} from 'react-redux';
-import Action from "./Actions";
+import * as Actions from "./Actions";
+import {Action} from "redux-support-action-class";
+import type {State} from '../reducer';
+import type {Connector} from 'react-redux';
+import type {Dispatch} from 'redux';
+
 import './Counter.scss';
 
-class Counter extends Component {
-  render() {
-    const {show, value, dispatch} = this.props;
+type Props = {
+  show: boolean,
+  value: number,
+  dispatch: Dispatch<State, Action>
+}
+
+const connector: Connector<{}, Props> = connect(
+  ({Counter}: State) => {
+    const {show, value} = Counter;
+    return {show, value};
+  }
+);
+
+export default connector(
+  ({show, value, dispatch}: Props) => {
     if (!show) return null;
     return (
       <div className="Counter">
-        <div style={{height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-          <div style={{flex: 1}}> </div>
+        <div
+          style={{height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+          <div style={{flex: 1}}></div>
           <div>
             {value}
           </div>
           <div>
-            <button onClick={() => dispatch(new Action.Decrement())}>-</button>
-            <button onClick={() => dispatch(new Action.Increment())}>+</button>
+            <button onClick={() => dispatch(new Actions.Decrement())}>-</button>
+            <button onClick={() => dispatch(new Actions.Increment())}>+</button>
           </div>
-          <div style={{flex: 1}}> </div>
+          <div style={{flex: 1}}></div>
         </div>
       </div>
     );
   }
-}
-
-export default connect(
-  ({Counter}) => {
-    const {show, value} = Counter;
-    return {show, value}
-  }
-)(Counter);
+);

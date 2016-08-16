@@ -18,7 +18,7 @@ store.subscribe(() => {
 
 ReactDOM.render(
   <Provider store={store}>
-    <Counter />
+    <Counter/>
   </Provider>
   , createRootAndAppendToBody()
 );

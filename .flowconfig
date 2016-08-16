@@ -1,6 +1,11 @@
+[ignore]
+<PROJECT_ROOT>/node_modules/fbjs
+
+[include]
+
 [libs]
-./node_modules/fbjs/flow/lib
 flow-typed
+node_modules/flow-interfaces-chrome/interfaces/
 
 [options]
 esproposal.class_static_fields=enable
@@ -12,3 +17,6 @@ module.name_mapper='^\(.*\)\.\(jpg\|png\|gif\|eot\|svg\|ttf\|woff\|woff2\|mp4\|w
 
 suppress_type=$FlowIssue
 suppress_type=$FlowFixMe
+
+[version]
+0.30.0

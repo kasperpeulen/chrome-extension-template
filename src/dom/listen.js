@@ -1,6 +1,6 @@
 // @flow
 import Actions from '../Actions';
-import Action from "redux-support-action-class";
+import {Action} from "redux-support-action-class";
 /**
  * Place to listen to dom events from the page the extension is inject in,
  * and dispatch action to the store.
@@ -37,7 +37,7 @@ type KeyboardInfo = {
   log?: boolean
 }
 
-function on(event: KeyboardEventTypes, {key, meta, alt, code, shift, ctrl, prevent = true, log = false}: KeyboardInfo, callback) {
+function on(event: KeyboardEventTypes, {key, meta, alt, code, shift, ctrl, prevent = true, log = false}: KeyboardInfo, callback: (e: KeyboardEvent) => void) {
   window.addEventListener(event, (e: KeyboardEvent) => {
     if (log) {
       console.log(e);

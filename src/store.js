@@ -6,7 +6,6 @@ import {
   supportActionClassMiddleware,
   Action
 } from "redux-support-action-class";
-
 import Actions from './Actions';
 
 export const store = createStore(

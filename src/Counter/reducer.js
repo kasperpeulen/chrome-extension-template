@@ -1,6 +1,6 @@
 // @flow
 import {Action} from 'redux-support-action-class';
-import Actions from './Actions';
+import * as Actions from './Actions';
 
 export type State = {
   value: number,

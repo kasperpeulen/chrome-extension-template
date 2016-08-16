@@ -2,5 +2,5 @@
 import Counter from './Counter';
 
 export default {
-  Counter: Counter.actions
+  Counter: Counter.Actions
 };

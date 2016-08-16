@@ -1,9 +1,11 @@
 declare module 'redux' {
 
   /*
-   S = State
-   A = Action
-   */
+
+    S = State
+    A = Action
+
+  */
 
   declare type Dispatch<S, A> = (action: A) => A;
 
@@ -12,7 +14,7 @@ declare module 'redux' {
     getState(): S;
   };
 
-  declare type Store<S, A: { type: $Subtype<string> }> = {
+  declare type Store<S, A> = {
     // rewrite MiddlewareAPI members in order to get nicer error messages (intersections produce long messages)
     dispatch: Dispatch<S, A>;
     getState(): S;

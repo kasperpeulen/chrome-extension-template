@@ -39,6 +39,7 @@
     "file-loader": "0.9.0",
     "filesize": "3.3.0",
     "flow-bin": "^0.30.0",
+    "flow-interfaces-chrome": "^0.1.1",
     "flowtype-loader": "^0.2.0",
     "gzip-size": "3.0.0",
     "html-loader": "0.4.3",

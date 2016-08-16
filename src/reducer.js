@@ -1,5 +1,5 @@
 // @flow
-import {Action} from 'redux-support-action-class';
+import {Action} from "redux-support-action-class";
 import Counter from './Counter';
 import type {State as CounterState} from './Counter';
 
