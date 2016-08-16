@@ -89,11 +89,11 @@ module.exports = {
         loader: 'eslint',
         include: paths.appSrc,
       },
-      // {
-      //   test: /\.js$/,
-      //   loader: 'flowtype',
-      //   include: paths.appSrc,
-      // }
+      {
+        test: /\.js$/,
+        loader: 'flowtype',
+        include: paths.appSrc,
+      }
     ],
     loaders: [
       // Process JS with Babel.
