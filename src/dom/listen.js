@@ -18,11 +18,11 @@ export default function listenToDom(dispatch: (action: Action) => void) {
     dispatch(new Actions.Counter.Hide());
   });
 
-  on('keydown', {code: 'KeyS', meta: true, alt: true, log: true}, () => {
+  on('keydown', {code: 'KeyS', meta: true, alt: true}, () => {
     dispatch(new Actions.Counter.Show());
   });
 
-  on('keydown', {code: 'KeyT', meta: true, alt: true, log: true}, () => {
+  on('keydown', {code: 'KeyT', meta: true, alt: true}, () => {
     dispatch(new Actions.Counter.Toggle());
   });
 }
