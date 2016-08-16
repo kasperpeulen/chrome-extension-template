@@ -69,7 +69,7 @@
     "react-dom": "^15.2.1",
     "react-redux": "^4.0.0",
     "redux": "^3.0.4",
-    "redux-support-action-class": "^0.6.0"
+    "redux-support-action-class": "^0.8.0"
   },
   "scripts": {
     "start": "node scripts/start.js",

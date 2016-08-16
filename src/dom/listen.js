@@ -40,10 +40,6 @@ type KeyboardInfo = {
 
 function on(event: KeyboardEventTypes, {key, meta, alt, code, shift, ctrl, prevent = true, log = false}: KeyboardInfo, callback: (e: KeyboardEvent) => void) {
   window.addEventListener(event, (e: KeyboardEvent) => {
-    if (log) {
-      console.log(e);
-    }
-
     if (key && e.key !== key) {
       return;
     }
@@ -64,6 +60,9 @@ function on(event: KeyboardEventTypes, {key, meta, alt, code, shift, ctrl, preve
     }
     if (prevent) {
       e.preventDefault();
+    }
+    if (log) {
+      console.log(e);
     }
     callback(e);
   });
