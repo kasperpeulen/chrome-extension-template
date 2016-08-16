@@ -9,6 +9,7 @@ export default function listenToDom(dispatch: (action: Action) => void) {
   on('keydown', {code: 'Equal', meta: true, alt: true}, () => {
     dispatch(new Actions.Counter.Increment());
   });
+
   on('keydown', {code: 'Minus', meta: true, alt: true}, () => {
     dispatch(new Actions.Counter.Decrement());
   });
